@@ -300,6 +300,9 @@ static void __cqhci_enable(struct cqhci_host *cq_host)
 
 	cqhci_writel(cq_host, cq_host->rca, CQHCI_SSC2);
 
+	if (cqhci_readl(cq_host, CQHCI_CTL) & CQHCI_HALT)
+		cqhci_writel(cq_host, 0, CQHCI_CTL);
+
 	/* send QSR at lesser intervals than the default */
 	cqhci_writel(cq_host, SEND_QSR_INTERVAL, CQHCI_SSC1);
 
