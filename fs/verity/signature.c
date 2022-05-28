@@ -29,8 +29,8 @@ static struct key *fsverity_keyring;
 /**
  * fsverity_verify_signature() - check a verity file's signature
  * @vi: the file's fsverity_info
- * @signature: the file's built-in signature
- * @sig_size: size of signature in bytes, or 0 if no signature
+ * @desc: the file's fsverity_descriptor
+ * @desc_size: size of @desc
  *
  * If the file includes a signature of its fs-verity file digest, verify it
  * against the certificates in the fs-verity keyring.

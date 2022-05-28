@@ -3243,6 +3243,17 @@ static inline int msm_pcie_oper_conf(struct pci_bus *bus, u32 devfn, int oper,
 			wr_val, rd_val, *val);
 	}
 
+	if (rd_val == PCIE_LINK_DOWN &&
+	   (readl_relaxed(config_base) == PCIE_LINK_DOWN)) {
+		if (dev->config_recovery) {
+			PCIE_ERR(dev,
+				"RC%d link recovery schedule\n",
+				rc_idx);
+			dev->cfg_access = false;
+			schedule_work(&dev->link_recover_wq);
+		}
+	}
+
 unlock:
 	spin_unlock_irqrestore(&dev->cfg_lock, dev->irqsave_flags);
 out:
@@ -5166,7 +5177,10 @@ static void handle_sbr_func(struct work_struct *work)
 	} else {
 		PCIE_ERR(dev, "PCIe RC%d link initialization failed\n",
 			dev->rc_idx);
+		return;
 	}
+	/* restore BME that gets cleared after link_down reset */
+	msm_pcie_write_mask(dev->dm_core + PCIE20_COMMAND_STATUS, 0, BIT(2));
 }
 
 static irqreturn_t handle_flush_irq(int irq, void *data)
@@ -6883,6 +6897,7 @@ int msm_pci_probe(struct pci_dev *pci_dev,
 static struct pci_device_id msm_pci_device_id[] = {
 	{PCI_DEVICE(0x17cb, 0x0108)},
 	{PCI_DEVICE(0x17cb, 0x010b)},
+	{PCI_DEVICE(0x1b21, 0x2806)},
 	{0},
 };
 

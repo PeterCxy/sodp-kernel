@@ -10,8 +10,8 @@
 #include <linux/uaccess.h>
 
 /**
- * fsverity_ioctl_measure() - get a verity file's digest
- * @filp: file to get digest of
+ * fsverity_ioctl_measure() - get a verity file's measurement
+ * @filp: file to get measurement of
  * @_uarg: user pointer to fsverity_digest
  *
  * Retrieve the file digest that the kernel is enforcing for reads from a verity
